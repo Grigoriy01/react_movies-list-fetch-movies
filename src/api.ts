@@ -1,13 +1,27 @@
+import { Movie } from './types/Movie';
 import { MovieData } from './types/MovieData';
 import { ResponseError } from './types/ReponseError';
 
-const API_URL = 'https://www.omdbapi.com/?apikey=your-key';
+const API_URL = 'https://www.omdbapi.com/?apikey=cb2f87';
 
-export function getMovie(query: string): Promise<MovieData | ResponseError> {
-  return fetch(`${API_URL}&t=${query}`)
-    .then(res => res.json())
-    .catch(() => ({
-      Response: 'False',
-      Error: 'unexpected error',
-    }));
+export async function getMovie(query: string): Promise<Movie> {
+  const response = await fetch(`${API_URL}&t=${query}`);
+
+  if (!response.ok) {
+    throw new Error('unexpected error');
+  }
+
+  const dataMovie: MovieData | ResponseError = await response.json();
+
+  if ('Error' in dataMovie) {
+    throw new Error(dataMovie.Error || 'Movie not found!');
+  }
+
+  return {
+    title: dataMovie.Title,
+    description: dataMovie.Plot,
+    imgUrl: dataMovie.Poster,
+    imdbUrl: `https://www.imdb.com/title/${dataMovie.imdbID}`,
+    imdbId: dataMovie.imdbID,
+  };
 }
