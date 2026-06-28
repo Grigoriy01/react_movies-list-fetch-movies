@@ -9,8 +9,9 @@ export const App = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [findMovie, setFindMovie] = useState<Movie | null>(null);
   const [query, setQuery] = useState<string>('');
-  const [, setIsLoading] = useState(false);// !!!!!!! 
-  const [, setError] = useState<string | null>(null);// !!!!!!! 
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [counter, setCounter] = useState(0);
 
   useEffect(() => {
     if (!query) {
@@ -31,7 +32,6 @@ export const App = () => {
       .catch(() => {
         if (isCurrent) {
           setError('Произошла ошибка');
-          setFindMovie(null);
         }
       })
       .finally(() => {
@@ -43,11 +43,28 @@ export const App = () => {
     return () => {
       isCurrent = false;
     };
-  }, [query, findMovie, movies]);
+  }, [query, counter]);
 
-  // helper for added the movie to Array movies
+  // helper for added the movie to Array movies(only dublicate)
   const handleAddMovie = (newMovie: Movie) => {
-    setMovies(prevMovies => [...prevMovies, newMovie]);
+    setMovies(prevMovies => {
+      const existingMovie = prevMovies.find(
+        movie => movie.imdbId === newMovie.imdbId,
+      );
+
+      if (existingMovie) {
+        setFindMovie(null);
+
+        return prevMovies;
+      }
+
+      return [...prevMovies, newMovie];
+    });
+  };
+
+  const handleSearch = (text: string) => {
+    setQuery(text);
+    setCounter(prev => prev + 1);
   };
 
   return (
@@ -61,7 +78,10 @@ export const App = () => {
           findMovie={findMovie}
           setFindMovie={setFindMovie}
           addMovie={handleAddMovie}
-          setQuery={setQuery}
+          onSearch={handleSearch}
+          error={error}
+          setError={setError}
+          isLoading={isLoading}
         />
       </div>
     </div>

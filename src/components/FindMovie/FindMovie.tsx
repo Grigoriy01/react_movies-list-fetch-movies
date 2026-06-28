@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import cn from 'classnames';
 import './FindMovie.scss';
 import { Movie } from '../../types/Movie';
 import { MovieCard } from '../MovieCard';
@@ -6,15 +7,21 @@ import { MovieCard } from '../MovieCard';
 type Props = {
   findMovie: Movie | null;
   addMovie: (movies: Movie) => void;
-  setQuery: (text: string) => void;
+  onSearch: (text: string) => void;
   setFindMovie: (movies: Movie | null) => void;
+  setError: (err: string | null) => void;
+  error: string | null;
+  isLoading: boolean;
 };
 
 export const FindMovie: React.FC<Props> = ({
   findMovie,
   addMovie,
-  setQuery,
+  onSearch,
   setFindMovie,
+  setError,
+  error,
+  isLoading,
 }) => {
   const [inputedText, setInputedText] = useState('');
 
@@ -35,14 +42,19 @@ export const FindMovie: React.FC<Props> = ({
               type="text"
               id="movie-title"
               placeholder="Enter a title to search"
-              className="input is-danger"
-              onChange={e => setInputedText(e.target.value)}
+              className={cn('input', error ? 'is-danger' : '')}
+              onChange={e => {
+                setInputedText(e.target.value);
+                setError(null);
+              }}
             />
           </div>
 
-          <p className="help is-danger" data-cy="errorMessage">
-            Can&apos;t find a movie with such a title
-          </p>
+          {error && (
+            <p className="help is-danger" data-cy="errorMessage">
+              Can&apos;t find a movie with such a title
+            </p>
+          )}
         </div>
 
         <div className="field is-grouped">
@@ -51,10 +63,10 @@ export const FindMovie: React.FC<Props> = ({
               disabled={isBtnFindDisabled}
               data-cy="searchButton"
               type="submit"
-              className="button is-light"
+              className={cn('button is-light', isLoading ? 'is-loading' : false)}
               onClick={e => {
                 e.preventDefault();
-                setQuery(inputedText);
+                onSearch(inputedText);
               }}
             >
               Find a movie
@@ -81,10 +93,12 @@ export const FindMovie: React.FC<Props> = ({
         </div>
       </form>
 
-      <div className="container" data-cy="previewContainer">
-        <h2 className="title">Preview</h2>
-        {findMovie && <MovieCard movie={findMovie} />}
-      </div>
+      {findMovie && (
+        <div className="container" data-cy="previewContainer">
+          <h2 className="title">Preview</h2>
+          {findMovie && <MovieCard movie={findMovie} />}
+        </div>
+      )}
     </>
   );
 };

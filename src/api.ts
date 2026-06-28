@@ -20,7 +20,10 @@ export async function getMovie(query: string): Promise<Movie> {
   return {
     title: dataMovie.Title,
     description: dataMovie.Plot,
-    imgUrl: dataMovie.Poster,
+    imgUrl:
+      dataMovie.Poster && dataMovie.Poster !== 'N/A'
+        ? dataMovie.Poster
+        : 'https://via.placeholder.com/360x270.png?text=no%20preview',
     imdbUrl: `https://www.imdb.com/title/${dataMovie.imdbID}`,
     imdbId: dataMovie.imdbID,
   };
