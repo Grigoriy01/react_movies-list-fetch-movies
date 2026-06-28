@@ -4,6 +4,23 @@ import { ResponseError } from './types/ReponseError';
 
 const API_URL = 'https://www.omdbapi.com/?apikey=cb2f87';
 
+// trancformation datas
+function mapToMovie(dataMovie: MovieData) {
+  const DEFAULT_POSTER =
+    'https://via.placeholder.com/360x270.png?text=no%20preview';
+
+  return {
+    title: dataMovie.Title,
+    description: dataMovie.Plot,
+    imgUrl:
+      dataMovie.Poster && dataMovie.Poster !== 'N/A'
+        ? dataMovie.Poster
+        : DEFAULT_POSTER,
+    imdbUrl: `https://www.imdb.com/title/${dataMovie.imdbID}`,
+    imdbId: dataMovie.imdbID,
+  };
+}
+
 export async function getMovie(query: string): Promise<Movie> {
   const response = await fetch(`${API_URL}&t=${query}`);
 
@@ -17,14 +34,5 @@ export async function getMovie(query: string): Promise<Movie> {
     throw new Error(dataMovie.Error || 'Movie not found!');
   }
 
-  return {
-    title: dataMovie.Title,
-    description: dataMovie.Plot,
-    imgUrl:
-      dataMovie.Poster && dataMovie.Poster !== 'N/A'
-        ? dataMovie.Poster
-        : 'https://via.placeholder.com/360x270.png?text=no%20preview',
-    imdbUrl: `https://www.imdb.com/title/${dataMovie.imdbID}`,
-    imdbId: dataMovie.imdbID,
-  };
+  return mapToMovie(dataMovie);
 }

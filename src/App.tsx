@@ -21,18 +21,28 @@ export const App = () => {
     let isCurrent = true;
 
     setIsLoading(true);
-    setError(null);
 
     getMovie(query)
       .then(data => {
         if (isCurrent) {
           setFindMovie(data);
+          setError(null);
         }
       })
-      .catch(() => {
-        if (isCurrent) {
-          setError('Произошла ошибка');
+      .catch((err: unknown) => {
+        if (!isCurrent) return;
+
+        if (err instanceof Error) {
+          if (err.message === 'Movie not found!') {
+            setError('Can&apos;t find a movie with such a title');
+          } else {
+            setError('Произошла ошибка при загрузке данных');
+          }
+        } else {
+          setError('Произошла непредвиденная ошибка');
         }
+
+        setFindMovie(null);
       })
       .finally(() => {
         if (isCurrent) {

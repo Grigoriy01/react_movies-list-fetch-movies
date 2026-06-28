@@ -63,7 +63,10 @@ export const FindMovie: React.FC<Props> = ({
               disabled={isBtnFindDisabled}
               data-cy="searchButton"
               type="submit"
-              className={cn('button is-light', isLoading ? 'is-loading' : false)}
+              className={cn(
+                'button is-light',
+                isLoading ? 'is-loading' : false,
+              )}
               onClick={e => {
                 e.preventDefault();
                 onSearch(inputedText);
