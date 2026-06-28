@@ -30,11 +30,13 @@ export const App = () => {
         }
       })
       .catch((err: unknown) => {
-        if (!isCurrent) return;
+        if (!isCurrent) {
+          return;
+        }
 
         if (err instanceof Error) {
           if (err.message === 'Movie not found!') {
-            setError('Can&apos;t find a movie with such a title');
+            setError("Can't find a movie with such a title");
           } else {
             setError('Произошла ошибка при загрузке данных');
           }
